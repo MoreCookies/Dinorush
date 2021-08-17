@@ -35,37 +35,91 @@ class dino {
     this.floorSprite = floorSprite;
     this.floorSprite2 = floorSprite2;
     this.dinosaur.debug = true;
+    this.dinosaur.setCollider("rectangle", 0, 0, this.dinosaur.width, this.dinosaur.height)
   }
 
   changeState() {
+    
+    //note, overlapPixel() checks if the given point is in the visible part of the sprite, which is good for the current situation.
+    /*
+    doesn't work, always falling
     //check if falling, is the velocity up
-    if(this.dinosaur.velocity.y >= 0 && this.floorSprite.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+105)==false || this.floorSprite2.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+101) == false) {
+    if(this.dinosaur.velocity.y > 0 && this.floorSprite.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+this.dinosaur.height/2)==false || this.floorSprite2.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+this.dinosaur.height/2) == false) {
       this.currentState = "fall";
-    /*check if jump*/} else if(this.dinosaur.velocity.y <= 0 && this.floorSprite.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+101)==false || this.floorSprite2.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+101) == false) {
+    /*check if jump*//*} else if(this.dinosaur.velocity.y < 0 && this.floorSprite.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+this.dinosaur.height/2)==false || this.floorSprite2.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+this.dinosaur.height/2) == false) {
       this.currentState = "jump";
-    /*Check if run*/} else if(this.dinosaur.velocity.y == 0 && this.floorSprite.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+101) || this.floorSprite2.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+101)) {
+    /*Check if run*//*} else if(this.dinosaur.velocity.y == 0 && this.floorSprite.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+this.dinosaur.height/2) || this.floorSprite2.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+this.dinosaur.height/2)) {
       this.currentState = "run";
       this.dinosaur.velocity.y = 0;
+      console.log("is run")
     }
+    */
+    /*
+    possible solution for collision, however very messy and hardcoded and stufs
+    doesn't make use of the p5.play lib which sucks
+    if(this.dinosaur.x-(this.dinosaur.width/2) < this.floorSprite.x+(this.floorSprite.width/2) && this.dinosaur.x+(this.dinosaur.width/2) > this.floorSprite.x-(this.floorSprite.width/2) && this.dinosaur.y-(this.dinosaur.height/2) < this.floorSprite.y+(this.floorSprite.height/2) && this.dinosaur.y+(this.dinosaur.height/2) > this.floorSprite.y-(this.floorSprite/2)) {
+
+    }
+    if(this.dinosaur.x-(this.dinosaur.width/2) < this.floorSprite.x+(this.floorSprite.width/2) && this.dinosaur.x+(this.dinosaur.width/2) > this.floorSprite.x-(this.floorSprite.width/2) && this.dinosaur.y-(this.dinosaur.height/2) < this.floorSprite.y+(this.floorSprite.height/2) && this.dinosaur.y+(this.dinosaur.height/2) > this.floorSprite.y-(this.floorSprite/2)) {
+      
+    }
+    */
   }
 
   update() {
+    function isCollide() {
+      console.log("on floor")
+      this.colliding = true
+      //colliding with floor, cancel out stuff
+      this.dinosaur.position.y -= 1;
+      this.dinosaur.velocity.y = 0;
+      
+    }
     //touch the floor - byebye goes velocity
     //this if statement is certified to work
-    if(this.floorSprite.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+101) || this.floorSprite2.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+101)) {
+    /*
+    if(this.floorSprite.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+this.dinosaur.height/2)==false || this.floorSprite2.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+this.dinosaur.height/2)==false) {
+      this.dinosaur.addSpeed(this.gravity, 90);
+    */
+    /*
+    if(this.floorSprite.overlapPixel(this.dinosaur.x, this.dinosaur.y+(this.dinosaur.height/2)) || this.floorSprite2.overlapPixel(this.dinosaur.x, this.dinosaur.y+(this.dinosaur.height/2))) {
+      this.dinosaur.velocity.y = 0;
       this.dinosaur.position.y--;
+      console.log("touching floor")
+      //it's touching the floor, make it run, and also make it so that it doesn't go down, cancel the gravity with gravity
+    } else {
+      this.dinosaur.addSpeed(this.gravity, 90);
+      console.log("falling")
+    }
+    /*
+    if(this.currentState == "fall" || this.currentState == "jump") {
+      this.dinosaur.addSpeed(this.gravity, 90)
+    } else {
       this.dinosaur.velocity.y = 0;
     }
+    */
+    this.colliding = false;
+    if(this.dinosaur.collide(this.floorSprite)) {
+      console.log("on floor")
+      this.colliding = true
+      //colliding with floor, cancel out stuff
+      this.dinosaur.position.y -= 1;
+      this.dinosaur.velocity.y = 0;
+    } else if(this.colliding != true) {
+      this.dinosaur.addSpeed(this.gravity, 90)
+      console.log("falling")
+    }
+
     //if the dinosaur is falling, make it fall
     if(this.currentState == "fall") {
       this.dinosaur.changeAnimation("fall");
+      console.log("is fall")
     } else if(this.currentState == "jump") {
-      this.dinosaur.addSpeed(this.gravity, 90);
       this.dinosaur.changeAnimation("jump");
+      console.log("is jump")
     } else if(this.currentState == "run") {
       this.dinosaur.changeAnimation("run")
     }
-    this.dinosaur.addSpeed(this.gravity, 90);
   }
 
   display() {
@@ -77,10 +131,11 @@ class dino {
   }
 
   handleKeypressed() {
-    if(keyCode == UP_ARROW && this.currentState == "run") {
-      this.dinosaur.velocity.y += this.jumpSpeed;
-    } else if(keyCode == DOWN_ARROW && this.currentState != "run") {
-      this.dinosaur.addSpeed(this.gravity*2, 90)
+    if(keyCode == UP_ARROW) {
+      this.dinosaur.velocity.y -= this.jumpSpeed;
+      this.currentState = "jump";
+    } else if(keyCode == DOWN_ARROW && this.currentState != "run" && this.floorSprite.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+this.dinosaur.height/2) || this.floorSprite2.overlapPoint(this.dinosaur.position.x, this.dinosaur.position.y+this.dinosaur.height/2)) {
+      this.dinosaur.addSpeed(this.gravity*1.5, 90)
     }
   }
 }
@@ -113,13 +168,13 @@ function setup() {
 
   floor1.changeAnimation('normal');
   floor2.changeAnimation('normal');
-  floor1.setCollider('rectangle', 0, 0, wWidth, 200);
-  floor2.setCollider('rectangle', 0, 0, wWidth, 200);
+  floor1.setCollider('rectangle', 0, 0, wWidth+100, 200);
+  floor2.setCollider('rectangle', 0, 0, wWidth+100, 200);
   //change frame rate for CONSISTENCY
   frameRate(fr);
 
   //dinosaur
-  dino1 = new dino(wWidth/2, wHeight-500, runAnimation, jumpAnimation, fallAnimation, 1, floor1, floor2, 10)
+  dino1 = new dino(wWidth/2, wHeight-400, runAnimation, jumpAnimation, fallAnimation, 1, floor1, floor2, 10)
 }
 
 function draw() {
