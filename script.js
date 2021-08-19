@@ -6,8 +6,13 @@ wWidth = 500;
 x1 = wWidth;
 x2 = 0;
 fr = 30;
-obstalces = [];
-function atLeft(x, y, width) {
+var frameCounter = 0;
+var time;
+let obstacleInterval;
+let randomObject;
+
+obstacles = [];
+function atLeft(x, width) {
   if(x-(width/2) <= 0) {
     return true
   }
@@ -136,13 +141,16 @@ function setup() {
   floor2.setCollider('rectangle', 0, 0, floor2.width, floor2.height);
   //change frame rate for CONSISTENCY
   frameRate(fr);
-
   //dinosaur
   dino1 = new dino(wWidth/4, wHeight-400, runAnimation, jumpAnimation, fallAnimation, 1, floor1, floor2, 19)
 }
 
 function draw() {
-  
+  obstacleInterval = round(random(3, 5));
+  second = (frameCounter % fr);
+  if(second >= 29) {
+    time += 1
+  }
   //background here
   image(forestbg1, x1, 0, wWidth, wHeight)
   image(forestbg2, x2, 0, wWidth, wHeight)
@@ -151,7 +159,6 @@ function draw() {
     floor1.position.x = wWidth*1.6;
   } else if(floor2.position.x <= -wWidth/1.8) {
     floor2.position.x = wWidth*1.6;
-  
   }
   //put other background in front if too far
   if(x1 <= -wWidth) {
@@ -159,7 +166,23 @@ function draw() {
   } else if(x2 <= -wWidth) {
     x2 = wWidth;
   }
-  
+  randomObject = random(0, 3)
+  if(randomObject <= 2.5) {
+    //grass
+  } else if(randomObject <= 2.75) {
+    //rock
+  } else if(randomObject <= 3) {
+    //fire
+  }
+  if(time >= obstacleInterval) {
+    //make tree
+  }
+  for(var i = 0; i < obstacles.length; i++) {
+    if(atLeft(obstacles[i].obstacle.position.x, obstacles[i].obstacle.width)) {
+      //remove current obstacle at index
+    }
+  }
+
   dino1.update()
   dino1.handleKeypressed()
   
@@ -170,4 +193,5 @@ function draw() {
   floor1.velocity.x = -wWidth/fr;
   floor2.velocity.x = -wWidth/fr;
   drawSprites()
+  frameCounter += 1;
 }
